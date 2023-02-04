@@ -13,7 +13,8 @@ class MovingAverage():
         # Load the stock data into a DataFrame
         
         # TODO: NEEDS TO BE UPDATED TO WORK FOR ALL HISTORICAL DATA
-        df = pd.read_csv('data/NSE100StockData/ACC.NShistorical_data.csv')
+        # df = pd.read_csv()
+        df = pd.read_csv(self.__data)
 
         df[self.__short_term_ema] = df['Close'].ewm(span=7).mean()
         df[self.__long_term_ema] = df['Close'].ewm(span=20).mean()
@@ -27,5 +28,6 @@ class MovingAverage():
 
         return df
 
-    def plotCols(self):
+    def plotCols(self, data):
+        self.__data = data
         return [self.__short_term_ema, self.__long_term_ema, self.__Close]

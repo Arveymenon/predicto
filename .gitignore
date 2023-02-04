@@ -1,2 +1,4 @@
 /deletable
 /data
+/__pycache__
+/venv
