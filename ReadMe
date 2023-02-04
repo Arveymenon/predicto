@@ -1,6 +1,8 @@
 ## To initialize the project
 cd venv
-run source bin/activate
+
+## run
+source bin/activate
 
 ## To start the application
 flask run
