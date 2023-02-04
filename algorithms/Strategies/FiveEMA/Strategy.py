@@ -16,7 +16,11 @@ class Strategy(bt.Strategy):
         self.data_15min_close = self.datas[1].close
         self.ema_5min = bt.indicators.ExponentialMovingAverage(self.data_5min_close, period=5)
         self.ema_15min = bt.indicators.ExponentialMovingAverage(self.data_15min_close, period=5)
-        print("Initial Broker Cash", self.broker.cash)
+
+        self.prev_5min_close = None
+        self.prev_15min_close = None
+        self.prev_ema_5min = None
+        self.prev_ema_15min = None
         self.count = 0
 
     def notify_order(self, order):
@@ -30,17 +34,23 @@ class Strategy(bt.Strategy):
                 self.count -= 1
 
             self.bar_executed = len(self)
-
-        self.order = None
+        
 
 
     def next(self):
-        
-        if not self.position:
-            if self.data_5min_close[0] > self.ema_5min[0] and self.data_15min_close[0] > self.ema_15min[0]:
-                self.buy()
-        elif self.data_5min_close[0] < self.ema_5min[0] and self.data_15min_close[0] < self.ema_15min[0]:
-            self.sell()
+        if(self.prev_15min_close != None):
+            if not self.position:
+                if self.data_15min_close[0] > self.ema_15min[0] and self.prev_15min_close[0] < self.prev_ema_15min[0]:
+                    self.buy()
+            else:
+                if self.data_5min_close[0] < self.ema_5min[0] and self.prev_5min_close[0] > self.prev_ema_5min[0]:
+                    self.sell()
+
+        self.prev_15min_close = self.data_15min_close
+        self.prev_5min_close = self.data_5min_close
+        self.prev_ema_15min = self.ema_15min
+        self.prev_ema_5min = self.ema_5min
+
 
     def stop(self):
         print(self.count)

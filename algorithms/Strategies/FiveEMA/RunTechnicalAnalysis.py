@@ -57,7 +57,6 @@ class RunTechnicalAnalysis5EMA():
         print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
         results = cerebro.run()
-
         # print(results[0][0].analyzers.TAnalyzer.get_analysis())
 
         # suggested_df = self.getIdealParams(results)
