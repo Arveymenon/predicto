@@ -18,7 +18,7 @@ INITIAL_INVESTMENT = 100000
 
 class RunTechnicalAnalysis():
     
-    def backtestMovingAverage(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
+    def backtestMovingAverage(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
         print("Backtesting: started")
         cerebro = bt.Cerebro()
@@ -79,7 +79,7 @@ class RunTechnicalAnalysis():
 
         return df
 
-    def forwardtestMovingAverage(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
+    def forwardtestMovingAverage(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         print("Forwardtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)

@@ -16,23 +16,25 @@ from generateData import GenerateData
 
 
 INITIAL_INVESTMENT = 100000
+COMMISSION = 0.002
 
 class RunTechnicalAnalysis5EMA():   
     
-    def backtest(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
+    def backtest(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
         print("Backtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
+        cerebro.broker.setcommission(commission=COMMISSION)
         print("Backtesting: using 5 days old data")
         
         generateData = GenerateData()
 
-        period = "5d"
+        period = "1mo"
         #-------------------- data set --------------------------
 
         dataname1 = generateData.createData(symbol, interval="15m", period=period)
-        dataname2 = generateData.createData(symbol, interval ="5m", period = period)
+        dataname2 = generateData.createData(symbol, interval ="5m", period=period)
 
         data1 = bt.feeds.YahooFinanceCSVData(
             dataname = dataname1,
@@ -51,12 +53,13 @@ class RunTechnicalAnalysis5EMA():
         # Define the optimization parameters and ranges
         cerebro.addstrategy(Strategy)
         # cerebro.optstrategy(Strategy)
-        # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
+        cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
 
 
         print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
         results = cerebro.run()
+        # cerebro.plot()
         # print(results[0][0].analyzers.TAnalyzer.get_analysis())
 
         # suggested_df = self.getIdealParams(results)
@@ -65,40 +68,13 @@ class RunTechnicalAnalysis5EMA():
 
         print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
         print("Backtesting: ended")
-
-    def forwardtest(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
-        print("Forwardtesting: started")
-        cerebro = bt.Cerebro()
-        cerebro.broker.setcash(initialInvestment)
-        print("Forwardtesting: using 1 years old data")
-        start_date = (datetime.now() - timedelta(days=365 * 1)).strftime("%Y-%m-%d")
-        end_date = (datetime.now() - timedelta(days=365 * 0)).strftime("%Y-%m-%d")
-
-        dataname = self.createData(symbol, startDate=start_date, endDate=end_date)
-
-        data = bt.feeds.YahooFinanceCSVData(
-            dataname = dataname,
-            reverse=False
-        )
-
-        cerebro.adddata(data)
-        
-        cerebro.optstrategy(Strategy, fast = self.fast_ema, slow =  self.slow_ema)
-
-        cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
-
-        print('Forwardtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-        results = cerebro.run()
-        
-        suggested_df = self.getIdealParams(results)
-
-        print(suggested_df.iloc[0])
-
-        print('Forwardtesting: Final portfolio Value:'+ str(cerebro.broker.getvalue()))
-        print("Forwardtesting: end")
+    
 
     def __init__(self, data: DataFrame) -> None:
-        self.backtest(symbol="^NSEI")
-        # self.forwardtest(symbol="^NSEI")
+        # NSE index
+        # self.backtest(symbol="^NSEI")
+
+        #
+        self.backtest(symbol="ADANIGREEN.NS")
+        # self.backtest(symbol="WIPRO.NS")
         pass
