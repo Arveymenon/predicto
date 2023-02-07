@@ -37,9 +37,6 @@ class GenerateData():
         # get data for which stock
         df = pd.read_csv(r'./data/nifty100.csv')
         df['Symbol'] = df['Symbol']+'.NS'
-
-        # if not os.path.exists('./data/NSE100StockData'):
-        #     os.makedirs('./data/NSE100StockData')
         
         if(symbol):
             yf.download(symbol, period=period, interval=interval).to_csv("./data/NSE100StockData/"+symbol+".historical_data.csv")

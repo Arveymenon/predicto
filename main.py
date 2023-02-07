@@ -1,7 +1,8 @@
 from flask import Flask
-from algorithms.Strategies.FiveEMA.RunTechnicalAnalysis import RunTechnicalAnalysis5EMA
+from algorithms.Strategies.MACD.RunTechnicalAnalysis import RunTechnicalAnalysis
 
 from generateData import GenerateData
+from kite_connect.main import KiteConnect
 
 # from test import MyStrategy
 
@@ -16,14 +17,18 @@ def hello():
 
 
 if __name__ == "__main__":
-    data = GenerateData()
 
-     # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
-     # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+    # init kite connect
+    kite = KiteConnect().kite
+    # print(kite.holdings())
+    
+    # backtrading init
+    runTechnicalAnalysis = RunTechnicalAnalysis()       
 
-    # historicalData = data.historicalNSEData("1m", "1d")
-    # historicalData = data.historicalNSEData("1d", "2y","WIPRO.NS")
-    # historicalData = data.completeHistoricalNSEData()
-    # historicalData = data.historicalNSEData("1m", "5d","WIPRO.NS")
+    # setting this will 
+    # cerebro.run(broker=kite)
 
-    runTechnicalAnalysis = RunTechnicalAnalysis5EMA(data)
+
+# For Reference
+# valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
+# valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo

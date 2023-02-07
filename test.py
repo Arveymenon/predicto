@@ -1,50 +1,112 @@
-import pandas as pd
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import argparse
+
 import backtrader as bt
+import backtrader.feeds as btfeeds
+import backtrader.indicators as btind
 
-# Import the data into a pandas DataFrame
-df = pd.read_csv("data/NSE100StockData/ACC.NShistorical_data.csv", delimiter=",", index_col="date", parse_dates= True)
 
-# Create a Backtrader data feed
-data = bt.feeds.PandasData(dataname=df)
-
-class MyStrategy(bt.Strategy):
-    params = (("fast", 7), ("slow", 20))
+class SMAStrategy(bt.Strategy):
+    params = (
+        ('period', 10),
+        ('onlydaily', False),
+    )
 
     def __init__(self):
-        self.fast_ema = bt.indicators.EMA(period=self.params.fast)
-        self.slow_ema = bt.indicators.EMA(period=self.params.slow)
+        self.sma_small_tf = btind.SMA(self.data, period=self.p.period)
+        if not self.p.onlydaily:
+            self.sma_large_tf = btind.SMA(self.data1, period=self.p.period)
 
-    def next(self):
-        if not self.position:
-            if self.fast_ema > self.slow_ema:
-                self.buy()
-                self.stop_loss = self.data.close * 0.99
-        else:
-            if self.fast_ema < self.slow_ema:
-                self.sell()
-                self.stop_loss = None
-            else:
-                self.stop_loss = self.data.close * 0.99
+    def nextstart(self):
+        print('--------------------------------------------------')
+        print('nextstart called with len', len(self))
+        print('--------------------------------------------------')
+
+        super(SMAStrategy, self).nextstart()
 
 
-# Create a Cerebro instance
-cerebro = bt.Cerebro()
+def runstrat():
 
-# Add the strategy to Cerebro
-cerebro.addstrategy(MyStrategy)
+    date2num('2023-02-03 11:11:13')
 
-# Add the Returns analyzer to Cerebro
-cerebro.addanalyzer(bt.analyzers.Returns)
+    args = parse_args()
 
-# Run the strategy
-cerebro.run()
+    # Create a cerebro entity
+    cerebro = bt.Cerebro(stdstats=False)
+
+    # Add a strategy
+    if not args.indicators:
+        cerebro.addstrategy(bt.Strategy)
+    else:
+        cerebro.addstrategy(
+            SMAStrategy,
+
+            # args for the strategy
+            period=args.period,
+            onlydaily=args.onlydaily,
+        )
+
+    # Load the Data
+    datapath = args.dataname or './data/temp/ADANIGREEN-5minute.txt'
+    data = btfeeds.BacktraderCSVData(dataname=datapath)
+    cerebro.adddata(data)  # First add the original data - smaller timeframe
+
+    # tframes = dict(daily=bt.TimeFrame.Days, weekly=bt.TimeFrame.Weeks,
+    #                monthly=bt.TimeFrame.Months)
+    tframes = dict(ticker=bt.TimeFrame.Ticks ,minutes=bt.TimeFrame.Minutes ,daily=bt.TimeFrame.Days, weekly=bt.TimeFrame.Weeks,
+                   monthly=bt.TimeFrame.Months)
+
+    # Handy dictionary for the argument timeframe conversion
+    # Resample the data
+    if args.noresample:
+        datapath = args.dataname2 or '../../datas/2006-week-001.txt'
+        data2 = btfeeds.BacktraderCSVData(dataname=datapath)
+        # And then the large timeframe
+        cerebro.adddata(data2)
+    else:
+        cerebro.resampledata(data, timeframe=tframes[args.timeframe],
+                             compression=args.compression)
+
+    # Run over everything
+    cerebro.run()
+
+    # Plot the result
+    cerebro.plot(style='bar')
 
 
-for analyzer in cerebro.analyzers:
-    print(analyzer)
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Multitimeframe test')
 
-# Get the results of the Returns analyzer
-for name, returns in filter(lambda x: x[1] == 'Returns', cerebro.analyzers):
-    result = returns.get_analysis()
-    # Print the profits
-    print("Profits:", result['rtot'])
+    parser.add_argument('--dataname', default='', required=False,
+                        help='File Data to Load')
+
+    parser.add_argument('--dataname2', default='', required=False,
+                        help='Larger timeframe file to load')
+
+    parser.add_argument('--noresample', action='store_true',
+                        help='Do not resample, rather load larger timeframe')
+
+    parser.add_argument('--timeframe', default='ticker', required=False,
+                        choices=['ticker','minutes','daily', 'weekly', 'monhtly'],
+                        help='Timeframe to resample to')
+
+    parser.add_argument('--compression', default=50, required=False, type=int,
+                        help='Compress n bars into 1')
+
+    parser.add_argument('--indicators', action='store_true',
+                        help='Wether to apply Strategy with indicators')
+
+    parser.add_argument('--onlydaily', action='store_true',
+                        help='Indicator only to be applied to daily timeframe')
+
+    parser.add_argument('--period', default=10, required=False, type=int,
+                        help='Period to apply to indicator')
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    runstrat()

@@ -10,45 +10,59 @@ import yfinance as yf
 from algorithms.Analyzers.profit import ProfitAnalyzer
 
 import backtrader as bt
+from algorithms.Strategies.FiveEMA.KiteConnect import KiteConnectData
 from algorithms.Strategies.FiveEMA.Strategy import Strategy
 
+from algorithms.Strategies.FiveEMA.ResampleData import ResampledData
 from generateData import GenerateData
 
 
 INITIAL_INVESTMENT = 100000
+COMMISSION = 0.002
 
-class RunTechnicalAnalysis5EMA():   
+class RunTechnicalAnalysis: 
     
-    def backtest(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
+    def backtest(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
         print("Backtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
-        print("Backtesting: using 5 days old data")
+        cerebro.broker.setcommission(commission=COMMISSION)
         
-        generateData = GenerateData()
+        time_format = "%Y-%m-%d %H:%M:%S"
+        days = 30
+        print(f"Backtesting: using {days} days old data")
+    #---------------------Kite Data -------------------------#
 
-        period = "5d"
-        #-------------------- data set --------------------------
+        start_date = (datetime.now() - timedelta(days = days)).strftime(time_format)
+        end_date = (datetime.now()).strftime(time_format)
 
-        dataname1 = generateData.createData(symbol, interval="15m", period=period)
-        dataname2 = generateData.createData(symbol, interval ="5m", period = period)
+        kiteConnectData = KiteConnectData(time_format, symbol, fromDate=start_date, toDate=end_date, interval = ["5minute", "15minute"])
 
-        data1 = bt.feeds.YahooFinanceCSVData(
-            dataname = dataname1,
-            reverse=False
-        )
+        cerebro.adddata(kiteConnectData.data)
+        cerebro.adddata(kiteConnectData.data2)
 
-        data2 = bt.feeds.YahooFinanceCSVData(
-            dataname = dataname2,
-            reverse=False
-        )
+    #-------------------- Yahoo financee data --------------------------#
+        # generateData = GenerateData()
+        # period = "1mo"
+        # dataname1 = generateData.createData(symbol, interval="5m", period=period)
+        # dataname2 = generateData.createData(symbol, interval ="15m", period=period)
 
-        cerebro.adddata(data1)
-        cerebro.adddata(data2)
-        #-------------------- data set end --------------------------
+        # data1 = bt.feeds.BacktraderCSVData(
+        #     dataname = dataname1,
+        #     reverse=False
+        # )
 
-        # Define the optimization parameters and ranges
+        # data2 = bt.feeds.BacktraderCSVData(
+        #     dataname = dataname2,
+        #     reverse=False
+        # )
+
+        # cerebro.adddata(data1)
+        # cerebro.adddata(data2)
+    #-------------------- data set end --------------------------#
+
+        # # Define the optimization parameters and ranges
         cerebro.addstrategy(Strategy)
         # cerebro.optstrategy(Strategy)
         # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
@@ -56,49 +70,22 @@ class RunTechnicalAnalysis5EMA():
 
         print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-        results = cerebro.run()
-        # print(results[0][0].analyzers.TAnalyzer.get_analysis())
-
-        # suggested_df = self.getIdealParams(results)
-        # self.fast_ema = suggested_df['fast'].head(10).values
-        # self.slow_ema = suggested_df['slow'].head(10).values
+        cerebro.run()
+        # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['5min', '15min'])
 
         print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
-        print("Backtesting: ended")
+    
 
-    def forwardtest(self, symbol = "LT.NS", initialInvestment=INITIAL_INVESTMENT):
-        print("Forwardtesting: started")
-        cerebro = bt.Cerebro()
-        cerebro.broker.setcash(initialInvestment)
-        print("Forwardtesting: using 1 years old data")
-        start_date = (datetime.now() - timedelta(days=365 * 1)).strftime("%Y-%m-%d")
-        end_date = (datetime.now() - timedelta(days=365 * 0)).strftime("%Y-%m-%d")
+    def __init__(self) -> None:
+        # self.backtest(symbol="NFO:NIFTY23FEB16500CE")
+        self.backtest(symbol="NSE:ADANIGREEN")
+        # self.backtest(symbol="NSE:POLYCAB")
+        # self.backtest(symbol="NSE:NIFTYBEES")
 
-        dataname = self.createData(symbol, startDate=start_date, endDate=end_date)
-
-        data = bt.feeds.YahooFinanceCSVData(
-            dataname = dataname,
-            reverse=False
-        )
-
-        cerebro.adddata(data)
-        
-        cerebro.optstrategy(Strategy, fast = self.fast_ema, slow =  self.slow_ema)
-
-        cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
-
-        print('Forwardtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-        results = cerebro.run()
-        
-        suggested_df = self.getIdealParams(results)
-
-        print(suggested_df.iloc[0])
-
-        print('Forwardtesting: Final portfolio Value:'+ str(cerebro.broker.getvalue()))
-        print("Forwardtesting: end")
-
-    def __init__(self, data: DataFrame) -> None:
-        self.backtest(symbol="^NSEI")
-        # self.forwardtest(symbol="^NSEI")
-        pass
+        #---- for yahoo finance data
+        # NSE index
+        # self.backtest(symbol="^NSEI")
+        # self.backtest(symbol="HDFC.NS")
+        #
+        # self.backtest(symbol="ADANIGREEN.NS")
+        # self.backtest(symbol="WIPRO.NS")
