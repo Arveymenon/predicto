@@ -91,9 +91,19 @@ class KiteApp:
                   "interval": interval,
                   "continuous": 1 if continuous else 0,
                   "oi": 1 if oi else 0}
-        lst = self.session.get(
-            f"{self.root_url}/instruments/historical/{instrument_token}/{interval}", params=params,
-            headers=self.headers).json()["data"]["candles"]
+        try:
+            lst = self.session.get(
+                f"{self.root_url}/instruments/historical/{instrument_token}/{interval}", params=params,
+                headers=self.headers).json()["data"]["candles"]
+        except requests.exceptions.HTTPError as errh:
+            return "An Http Error occurred:" + repr(errh)
+        except requests.exceptions.ConnectionError as errc:
+            return "An Error Connecting to the API occurred:" + repr(errc)
+        except requests.exceptions.Timeout as errt:
+            return "A Timeout Error occurred:" + repr(errt)
+        except requests.exceptions.RequestException as err:
+            return "An Unknown Error occurred" + repr(err)
+            
         records = []
         for i in lst:
             record = {"Datetime": dateutil.parser.parse(i[0]), "Open": i[1], "High": i[2], "Low": i[3],

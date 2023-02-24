@@ -9,6 +9,13 @@ from pytz import timezone
 
 # Create a Stratey
 class Strategy(bt.Strategy):
+    params = (
+        ('macd1_period', 12),
+        ('macd2_period', 26),
+        ('signal_period', 9),
+        ('atr_period', 14),
+        ('atr_multiplier', 2),
+    )
 
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
@@ -17,8 +24,19 @@ class Strategy(bt.Strategy):
 
     def __init__(self):
         self.order = None
-        self.data_close = self.datas[0].close
-        self.macd = bt.indicators.MACD(self.data, plotname='5 min ema')
+
+        self.macd = bt.indicators.MACD(
+            self.data.close,
+
+            period_me1=self.params.macd1_period,
+            period_me2=self.params.macd2_period,
+            period_signal=self.params.signal_period,
+        )
+        self.atr = bt.indicators.ATR(
+            self.data,
+            period=self.params.atr_period
+        )
+        # self.macd = bt.indicators.MACD(self.data, plotname='5 min ema')
         
     def notify_order(self, order):
         if(order.status in [order.Submitted, order.Accepted]):
@@ -42,15 +60,18 @@ class Strategy(bt.Strategy):
     def next(self):
 
         ### comment this block and might need to remove self.order from store buy() and sell() in self.order to enable short selling
-        if self.order:
-            return
+        # if self.order:
+        #     return
         ### ----------------------------------------------
         if not self.position:
-            if (self.macd.macd[0] > self.macd.signal[0]) and (self.macd.macd[-1] < self.macd.signal[-1]):
+            if self.macd.macd[0] > self.macd.signal[0] and \
+                self.macd.macd[-1] < self.macd.signal[-1] and \
+                self.data.close[0] > self.atr[-1] * self.params.atr_multiplier:
                 self.order = self.buy()
         else:
-            if (self.macd.macd[0] < self.macd.signal[0]) and (self.macd.macd[-1] > self.macd.signal[-1]):
-                self.order = self.close()
+             if self.macd.macd[0] < self.macd.signal[0] and \
+                    self.macd.macd[-1] > self.macd.signal[-1]:
+                self.order = self.sell()
 
     def stop(self):
         # print("Count:", self.count)
