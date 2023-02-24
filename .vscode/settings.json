@@ -1,5 +1,8 @@
 {
     "python.analysis.extraPaths": [
         "./kite_connect"
+    ],
+    "cSpell.words": [
+        "CGPT"
     ]
 }

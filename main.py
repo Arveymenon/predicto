@@ -1,9 +1,13 @@
+import os
+import shutil
+from configuration import config
 from flask import Flask
 from algorithms.Strategies.MACD.RunTechnicalAnalysis import RunTechnicalAnalysis
 
 from kite_connect.main import KiteConnect
 
 from backtesting.main import Backtesting
+from shortlisting.main import Shortlist
 
 app = Flask(__name__)
 
@@ -23,6 +27,13 @@ if __name__ == "__main__":
     
     # backtrading init
     # runTechnicalAnalysis = RunTechnicalAnalysis()       
+    print("If temporary path exists",os.path.exists(config["temp_files_path"]))
+    if os.path.exists(config["temp_files_path"]):
+        shutil.rmtree(config["temp_files_path"])
+        
+    os.mkdir(config["temp_files_path"])
+
+    Shortlist()
     Backtesting()
 
     # setting this will 

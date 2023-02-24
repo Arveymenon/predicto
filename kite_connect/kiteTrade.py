@@ -106,8 +106,11 @@ class KiteApp:
             
         records = []
         for i in lst:
-            record = {"Datetime": dateutil.parser.parse(i[0]), "Open": i[1], "High": i[2], "Low": i[3],
-                      "Close": i[4], "Volume": i[5]}
+            record = {
+                        "Datetime": dateutil.parser.parse(i[0]).replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S"),
+                        "Open": i[1], "High": i[2], "Low": i[3],
+                        "Close": i[4], "Volume": i[5]
+                    }
             if len(i) == 7:
                 record["oi"] = i[6]
             records.append(record)

@@ -1,31 +1,127 @@
 import pandas as pd
 from backtesting import multiprocessedBacktesting
-from algorithms.Strategies.MACD.Strategy import Strategy
+# from algorithms.Strategies.MovingAverageCrossover.Strategy import Strategy
+from algorithms.Strategies.FiveEMA.Strategy import Strategy
+from algorithms.Strategies.CGPTGenerated import CGPTGeneratedStrategy
 from datetime import datetime, timedelta
 
+
 from backtesting.backtest import backtest
+from configuration import config
+
+shortlist = config["shortlisting"]["strategyName"]
+dataSetFileName = config["input_file"]
+algo = config["backtesting"]["strategyName"]
+
+
 
 class Backtesting:
 
     def __init__(self) -> None:
 
-        df = pd.read_csv(r'./data/volitileStocks.csv')
+        df = pd.read_csv(r'./data/responseData/shortlist/'+shortlist+"."+dataSetFileName+'.csv')
         df['Symbol'] = 'NSE:'+ df['Symbol']
         symbols = df['Symbol'].to_list()
-        symbol = 'NSE:NIFTY BANK'
+        # symbols = ["NSE:PATANJALI-BE"]
 
         datetime_format = "%Y-%m-%d %H:%M:%S"
-        interval = ["5minute"]
+        interval = ["5minute", "15minute"]
 
         backtestTimeFrame = [
-            (datetime.now() - timedelta(days = 30)).strftime(datetime_format),
-            (datetime.now() - timedelta(days = 0)).strftime(datetime_format)
+            (datetime.now() - timedelta(days = 173)).strftime(datetime_format),
+            (datetime.now() - timedelta(days = 166)).strftime(datetime_format)
         ]
 
         forwardTimeFrame = [
-            (datetime.now() - timedelta(days = 30)).strftime(datetime_format),
+            (datetime.now() - timedelta(days = 5)).strftime(datetime_format),
             (datetime.now() - timedelta(days = 0)).strftime(datetime_format)
         ]
 
-        # multiprocessedBacktesting.multiProcessedBacktest(symbols, datetime_format, interval, Strategy, backtestTimeFrame,True, forwardTimeFrame)
-        backtest(symbol, backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, Strategy)
+        optimization_params = None
+        # optimization_params = {
+        #     # 'test': True
+        # }
+        # "fast": range(5,10),
+        # "slow": range(15,30)
+
+        # multiprocessedBacktesting \
+        #                 .multiProcessedBacktest(
+        #                     symbols,
+        #                     datetime_format, interval, 
+        #                     Strategy, backtestTimeFrame,True, forwardTimeFrame,
+        #                     plot = False, 
+        #                     optimization_params=optimization_params
+        #                 )
+
+        if(optimization_params == None):
+            # back_tested_data = backtest(
+            #         symbol,
+            #         backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
+            #         Strategy,
+            #         plot=True,
+            #         optimization_params=None
+            #     )
+            results = []
+            for symbol in symbols :
+                back_tested_data = backtest(
+                        symbol,
+                        backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval,
+                        Strategy,
+                        plot=False,
+                        optimization_params=None
+                    )
+                results.append([back_tested_data['symbol'], back_tested_data['value']])
+                
+            df = pd.DataFrame(results, columns = ["symbol", "value"])
+
+            df = df.sort_values(by='value', ascending=False)
+            print(df)
+            df.to_csv("./data/responseData/backtest/"+dataSetFileName+"."+algo+".csv")
+
+        else:
+            # "fast", "slow", "stop_loss", "take_profit",
+            optimum_params = pd.DataFrame([], columns = [
+                                                "symbol", "net_profit", 'won_total', 'lost_total'])
+            for symbol in symbols:
+                back_tested_data = backtest(
+                    symbol,
+                    backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
+                    Strategy,
+                    plot=False,
+                    optimization_params=optimization_params
+                )
+
+                if(not back_tested_data.empty):
+                    back_tested_data["symbol"] = symbol
+
+                    # If only backtesting is required
+                    # optimum_params = optimum_params.append(back_tested_data.iloc[0],ignore_index=True)
+
+                    # forward testing 
+                    # "fast": back_tested_data["fast"],
+                    # "slow": back_tested_data["slow"]
+                    forward_test_optimization_param = {
+                        'test': True
+                    }
+
+                    forward_tested_data = backtest(
+                        symbol,
+                        forwardTimeFrame[0], forwardTimeFrame[1], datetime_format, interval, 
+                        Strategy,
+                        plot=True,
+                        optimization_params=forward_test_optimization_param
+                    )
+
+                    if(not forward_tested_data.empty):
+                        # optimum_params.loc[symbol] = forward_tested_data
+                        forward_tested_data["symbol"] = symbol
+                        optimum_params = optimum_params.append(forward_tested_data.iloc[0],ignore_index=True)
+
+
+            optimum_params = optimum_params.sort_values(by='net_profit', ascending=False)
+            optimum_params.to_csv("./data/responseData/MovingAverageCrossover."+dataSetFileName+".csv")
+            print(optimum_params)
+
+
+
+

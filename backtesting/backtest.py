@@ -1,37 +1,88 @@
 import backtrader as bt
-from algorithms.Strategies.MACD.KiteConnect import KiteConnectData
 
-INITIAL_INVESTMENT = 100000
-COMMISSION = 0.002
+from DataConnect.KiteConnect import KiteConnectData
+from backtesting.commission import ZerodhaCommission
+from pandas import DataFrame
 
-def backtest(symbol, start_date, end_date, datetime_format, interval, strategy, initialInvestment=INITIAL_INVESTMENT):
-    # Backtesting 
-    print("Backtesting: started")
+INITIAL_INVESTMENT = 10000.0
+
+def backtest(
+        symbol, 
+        start_date, end_date, datetime_format, interval,
+        Strategy,
+        plot = False, 
+        optimization_params = None, 
+        initialInvestment=INITIAL_INVESTMENT
+    ):
+
+    # Backtesting
+    print("Backtesting: started for "+ symbol)
     cerebro = bt.Cerebro()
     cerebro.broker.setcash(initialInvestment)
-    cerebro.broker.setcommission(commission=COMMISSION)
+
+    cerebro.broker.setcommission(commission=0.0)  # Disable default commission
+    cerebro.broker.addcommissioninfo(ZerodhaCommission())
+
     
-#---------------------Kite Data -------------------------#
+    #---------------------Kite Data -------------------------#
     kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, interval = interval)
 
     if kiteConnectData.success:
 
-        cerebro.adddata(kiteConnectData.data)
-        #-------------------- Kite data end --------------------------#
+        for data in kiteConnectData.datas:
+            cerebro.adddata(data)
+            # cerebro.adddata(kiteConnectData.data2)
+
+    #-------------------- Kite data end --------------------------#
 
         # # Define the optimization parameters and ranges
-        cerebro.addstrategy(strategy)
-        # cerebro.optstrategy(Strategy)
-        # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
+        if optimization_params == None:
+            cerebro.addstrategy(Strategy)
+            
+            print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
+            cerebro.run()
+
+            if(plot):
+                # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
+                cerebro.plot(iplot=True, volume=False, style='candlestick')
+                # cerebro.plot()
+
+            print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+            return {"symbol": symbol, "value": cerebro.broker.getvalue()}
+
+        else:
+            cerebro.optstrategy(Strategy, **optimization_params)
+            cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
+            results = cerebro.run()
+            return getIdealParams(results)
 
 
-        print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
+def getIdealParams(results):
 
-        cerebro.run()
-        # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
-        # cerebro.plot(iplot=True, volume=False, style='bar')
-        # cerebro.plot()
+    opt_results = []
+    # print(results[0][0])
 
-        print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
+    # int(x[0].params.fast),
+    # int(x[0].params.slow),
+    # x[0].params.stop_loss,
+    # x[0].params.take_profit,
+    for x in results:
+        opt_results.append([
+            x[0].analyzers.TAnalyzer.get_analysis()['pnl']['net']['total'] if 'pnl' in x[0].analyzers.TAnalyzer.get_analysis() else 0,
+            x[0].analyzers.TAnalyzer.get_analysis()['won']['pnl']['total'] if 'won' in x[0].analyzers.TAnalyzer.get_analysis() else 0,
+            x[0].analyzers.TAnalyzer.get_analysis()['lost']['pnl']['total'] if 'lost' in x[0].analyzers.TAnalyzer.get_analysis() else 0
+        ])
 
-        return {"symbol": symbol, "value": cerebro.broker.getvalue()}
+    # "fast", "slow", "stop_loss", "take_profit", 
+    df = DataFrame(opt_results, columns = ["net_profit", 'won_total', 'lost_total'])
+    df = df \
+            .sort_values(by='net_profit', ascending=False).head(10)
+
+    print(df)
+
+    # fast = df['fast'].values
+    # slow = df['slow'].values
+    # print(fast, slow)
+
+    return df

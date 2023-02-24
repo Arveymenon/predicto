@@ -4,8 +4,23 @@ pipenv shell
 ## To start the application
 python3 main.py
 
+## Curently best returns working on
+# nsemidcap
+# shortlisting by insideDay (period 1 week)
+# backtest by 5 EMA (period 1 week)
 
 
+
+Order Status values
+0:'Created'
+1:'Submitted'
+2:'Accepted'
+3:'Partial'
+4:'Completed'
+5:'Canceled'
+6:'Expired'
+7:'Margin'
+8:'Rejected'
 
 
 # For Time Reference
