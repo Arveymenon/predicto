@@ -2,15 +2,17 @@ import os
 import shutil
 from configuration import config
 from flask import Flask
-from algorithms.Strategies.MACD.RunTechnicalAnalysis import RunTechnicalAnalysis
+import pandas as pd
+from datetime import datetime
 
 from kite_connect.main import KiteConnect
+from algorithms.Strategies.MACD.RunTechnicalAnalysis import RunTechnicalAnalysis
 
 from backtesting.main import Backtesting
 from shortlisting.main import Shortlist
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 @app.route('/')
 def hello():
