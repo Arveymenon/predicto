@@ -17,7 +17,7 @@ config = {
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
             "start_datetime": (datetime.now() - timedelta(days = 32)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 16:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"),
             "intervals": ["day"],
         },
         "plot": False,
@@ -28,11 +28,11 @@ config = {
         "isActive": False,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 4)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 3)).strftime("%Y-%m-%d 16:00:00"),
+            "start_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 4)).strftime("%Y-%m-%d 16:00:00"),
             "intervals": ["5minute", "15minute"],
         },
-        "plot": True,
+        "plot": False,
         "strategyName": "FiveEMA",
         "strategy": Strategy2,
         "optimization": False
@@ -49,14 +49,12 @@ def getConfig(backtest_start_date):
     now = datetime.strptime(str(backtest_start_date), "%Y-%m-%d %H:%M:%S")
 
     new_config["shortlisting"]["interval"]["start_datetime"] = (now - timedelta(days = 60)).strftime("%Y-%m-%d %H:%M:%S")
-    new_config["shortlisting"]["interval"]["end_datetime"] = (now - timedelta(days = 2)).strftime("%Y-%m-%d %H:%M:%S")
+    new_config["shortlisting"]["interval"]["end_datetime"] = (now - timedelta(days = 2)).strftime("%Y-%m-%d 09:15:00")
 
     new_config["backtesting"]["interval"]["start_datetime"] = (now - timedelta(days = 1)).strftime("%Y-%m-%d 09:15:00")
     new_config["backtesting"]["interval"]["end_datetime"] = (now - timedelta(days = 0)).strftime("%Y-%m-%d 09:30:00")
 
     return new_config
-
-    return config
 
 # "forwardtesting": {
 #     "isActive": True,
