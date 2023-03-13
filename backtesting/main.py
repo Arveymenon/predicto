@@ -7,35 +7,33 @@ from datetime import datetime, timedelta
 
 
 from backtesting.backtest import backtest
-from configuration import config
+# from configuration import config
 
-shortlist = config["shortlisting"]["strategyName"]
-dataSetFileName = config["input_file"]
-algo = config["backtesting"]["strategyName"]
 
 
 
 class Backtesting:
 
-    def __init__(self) -> None:
+    def __init__(self ,config) -> None:
+        shortlist = config["shortlisting"]["strategyName"]
+        dataSetFileName = config["input_file"]
+        algo = config["backtesting"]["strategyName"]
 
         df = pd.read_csv(r'./data/responseData/shortlist/'+shortlist+"."+dataSetFileName+'.csv')
         df['Symbol'] = 'NSE:'+ df['Symbol']
         symbols = df['Symbol'].to_list()
         # symbols = ["NSE:PATANJALI-BE"]
 
+
         datetime_format = "%Y-%m-%d %H:%M:%S"
         interval = ["5minute", "15minute"]
 
         backtestTimeFrame = [
-            (datetime.now() - timedelta(days = 173)).strftime(datetime_format),
-            (datetime.now() - timedelta(days = 166)).strftime(datetime_format)
+            config["backtesting"]["interval"]["start_datetime"],
+            config["backtesting"]["interval"]["end_datetime"]
         ]
 
-        forwardTimeFrame = [
-            (datetime.now() - timedelta(days = 5)).strftime(datetime_format),
-            (datetime.now() - timedelta(days = 0)).strftime(datetime_format)
-        ]
+        forwardTimeFrame = []
 
         optimization_params = None
         # optimization_params = {
@@ -62,12 +60,14 @@ class Backtesting:
             #         optimization_params=None
             #     )
             results = []
+            budget = config["initialInvestment"]/len(symbols)
             for symbol in symbols :
                 back_tested_data = backtest(
                         symbol,
                         backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval,
-                        Strategy,
-                        plot=False,
+                        config["backtesting"]["strategy"],
+                        budget,
+                        plot=config["backtesting"]["plot"],
                         optimization_params=None
                     )
                 results.append([back_tested_data['symbol'], back_tested_data['value']])
@@ -76,6 +76,8 @@ class Backtesting:
 
             df = df.sort_values(by='value', ascending=False)
             print(df)
+            self.total = df["value"].sum()
+            print(self.total)
             df.to_csv("./data/responseData/backtest/"+dataSetFileName+"."+algo+".csv")
 
         else:
@@ -86,7 +88,7 @@ class Backtesting:
                 back_tested_data = backtest(
                     symbol,
                     backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
-                    Strategy,
+                    config["backtesting"]["interval"]["strategy"],
                     plot=False,
                     optimization_params=optimization_params
                 )
@@ -120,7 +122,6 @@ class Backtesting:
 
             optimum_params = optimum_params.sort_values(by='net_profit', ascending=False)
             optimum_params.to_csv("./data/responseData/MovingAverageCrossover."+dataSetFileName+".csv")
-            print(optimum_params)
 
 
 

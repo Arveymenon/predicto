@@ -24,14 +24,12 @@ class RunTechnicalAnalysis:
     
     def backtest(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
-        print("Backtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
         cerebro.broker.setcommission(commission=COMMISSION)
         
         time_format = "%Y-%m-%d %H:%M:%S"
         days = 30
-        print(f"Backtesting: using {days} days old data")
     #---------------------Kite Data -------------------------#
 
         start_date = (datetime.now() - timedelta(days = days)).strftime(time_format)
@@ -68,12 +66,10 @@ class RunTechnicalAnalysis:
         # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
 
 
-        print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
         cerebro.run()
         # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['5min', '15min'])
 
-        print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
     
 
     def __init__(self) -> None:

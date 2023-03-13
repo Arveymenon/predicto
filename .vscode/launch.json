@@ -19,6 +19,14 @@
             "program": "main.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: run longTermtesting file",
+            "type": "python",
+            "request": "launch",
+            "program": "longTermtesting.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

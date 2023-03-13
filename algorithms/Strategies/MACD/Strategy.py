@@ -20,11 +20,8 @@ class Strategy(bt.Strategy):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date()
         time = dt or self.datas[0].datetime.time()
-        print('%s, %s' % (dt.format("%Y-%m-%d %H:%M:%S"), txt))
-        print(time)
 
     def __init__(self):
-        print("MACD Strategy")
         self.day = 0
 
         # for short selling
@@ -51,12 +48,9 @@ class Strategy(bt.Strategy):
                 recom_stop_price = self.data.close[0] * (1 - self.params.stop_loss)
                 self.stop_price = max(recom_stop_price, self.stop_price)
 
-                print("Bought ", self.position.size, "at ", order.executed.price, "on")
             elif (order.issell()):
                 self.stop_price = 0.0
-                print("Sold ", self.position.size, "at ", order.executed.price, "on")
 
-            print(self.datas[0].datetime.datetime())
 
         pass
 
@@ -69,7 +63,6 @@ class Strategy(bt.Strategy):
         
         if self.macd.lines.macd[0] > self.macd.lines.signal[0] and \
             self.macd.lines.macd[-1] <= self.macd.lines.signal[-1]:
-            print("buy at ",self.datas[0].datetime.datetime())
             # Buy signal
             self.buy(size = 1)
 
@@ -83,17 +76,14 @@ class Strategy(bt.Strategy):
                 
             if self.macd.lines.macd[0] < self.macd.lines.signal[0] and \
                 self.macd.lines.macd[-1] >= self.macd.lines.signal[-1]:
-                print("sell at",self.datas[0].datetime.datetime())
                 # Sell signal
                 self.close()
             
 
         # Day end closing
         # if(str(self.datas[0].datetime.time()) == str('15:00:00')):
-        #     print("Day end")
         #     self.close()
         #     self.day = self.day + 1
 
     def stop(self):
-        print("Days count: ",self.day)
-        print("Position", self.position)
+        pass

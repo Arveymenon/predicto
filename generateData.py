@@ -19,7 +19,6 @@ class GenerateData():
     suggestedBuy = []
 
     def plotLine(self, df, x_axis: str, y_axis: str, dimensions):
-        print("GenerateData:plotLine function started")
         df.to_csv("data/temp/ACC.NShistorical_data_moving_avg.csv")
         
         fig = go.Figure()

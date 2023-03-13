@@ -20,8 +20,8 @@ class VolatilityStrategy(bt.Strategy):
         if self.data.close > self.bollinger.lines.top and self.atr > self.atr[1] and self.rvi > self.rvi.signal:
             self.trade_on = True
             
-    def stop(self):
-        if self.trade_on:
-            print(f"{self.data._name} is worth trading on")
-        else:
-            print(f"{self.data._name} is not worth trading on")
+    # def stop(self):
+    #     if self.trade_on:
+    #         print(f"{self.data._name} is worth trading on")
+    #     else:
+    #         print(f"{self.data._name} is not worth trading on")

@@ -70,14 +70,14 @@ class Strategy2(bt.Strategy):
         if(self.trade):
             if (self.data_15min_high[-1] < self.ema_15min[-1] and self.data_15min_high[0] >= self.ema_15min[0]):
                 if(not self.position):
-                    size = floor(self.broker.cash/self.datas[0].close)
+                    size = floor(self.broker.cash/self.datas[0].close[0])
                     self.order = self.buy(size=size, data=self.datas[0])
                 elif(self.position.size < 0):
                     self.close()
             
             if self.data_5min_low[0] < self.ema_5min[0] and self.data_5min_low[-1] > self.ema_5min[-1]:
                     if(not self.position):
-                        size = floor(self.broker.cash/self.datas[0].close)
+                        size = floor(self.broker.cash/self.datas[0].close[0])
                         self.order = self.sell(size=size, data=self.datas[0])
                     elif(self.position.size > 0):
                         self.close()

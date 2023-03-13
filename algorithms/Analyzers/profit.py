@@ -14,7 +14,7 @@ class ProfitAnalyzer(bt.Analyzer):
 
     def next(self):
         if self.order:
-            print("An order was completed")
+            # ("An order was completed")
             # Check if an order was placed
             if self.order.status == order.Completed:
                 if self.order.isbuy():

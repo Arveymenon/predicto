@@ -20,8 +20,6 @@ def multiProcessedBacktest(
 
             backtest_results = [x for x in backtest_results if x is not None]
             backtest_results = sorted(backtest_results, key=lambda result: result['value'], reverse=True)[:5]
-            print("Top 5 backtest_results")
-            print(backtest_results)
 
             # ---------------------- forward testing ---------------------------#
             if(forwardTest):
@@ -32,9 +30,6 @@ def multiProcessedBacktest(
                 forwardtest_results = pool.starmap(backtest, args)
                 pool.close()
                 pool.join()
-
-                print('forward test results')
-                print(forwardtest_results)
 
         else:
             pool = multiprocessing.Pool()
@@ -49,7 +44,6 @@ def multiProcessedBacktest(
             pool.close()
             pool.join()
 
-            print(backtest_results)
             # if(forwardTest):
             #     optimization_params
             #     pool = multiprocessing.Pool()
@@ -63,6 +57,3 @@ def multiProcessedBacktest(
             #     forwardtest_results = pool.starmap(backtest, args)
             #     pool.close()
             #     pool.join()
-
-            #     print('forward test results')
-            #     print(forwardtest_results)

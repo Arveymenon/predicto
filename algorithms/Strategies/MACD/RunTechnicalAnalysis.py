@@ -18,7 +18,6 @@ class RunTechnicalAnalysis:
 
     def backtest(self, symbol, start_date, end_date, time_format, interval, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
-        print("Backtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
         cerebro.broker.setcommission(commission=COMMISSION)
@@ -37,14 +36,12 @@ class RunTechnicalAnalysis:
             # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
 
 
-            print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
             cerebro.run()
             # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
             cerebro.plot(iplot=True, volume=False, style='bar')
             # cerebro.plot()
 
-            print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
 
             return {"symbol": symbol, "value": cerebro.broker.getvalue()}
     
@@ -66,8 +63,6 @@ class RunTechnicalAnalysis:
 
         backtest_results = [x for x in backtest_results if x is not None]
         backtest_results = sorted(backtest_results, key=lambda result: result['value'], reverse=True)[:5]
-        print("Top 5 backtest_results")
-        print(backtest_results)
 
         # ---------------------- forward testing ---------------------------#
         start_date = (datetime.now() - timedelta(days = 7)).strftime(time_format)
@@ -80,8 +75,6 @@ class RunTechnicalAnalysis:
         pool.close()
         pool.join()
 
-        print('forward test results')
-        print(forwardtest_results)
         pass
 
     def __init__(self) -> None:

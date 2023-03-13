@@ -4,15 +4,13 @@ from DataConnect.KiteConnect import KiteConnectData
 from backtesting.commission import ZerodhaCommission
 from pandas import DataFrame
 
-INITIAL_INVESTMENT = 10000.0
-
 def backtest(
         symbol, 
         start_date, end_date, datetime_format, interval,
         Strategy,
+        initialInvestment,
         plot = False, 
         optimization_params = None, 
-        initialInvestment=INITIAL_INVESTMENT
     ):
 
     # Backtesting
@@ -61,7 +59,6 @@ def backtest(
 def getIdealParams(results):
 
     opt_results = []
-    # print(results[0][0])
 
     # int(x[0].params.fast),
     # int(x[0].params.slow),
@@ -79,10 +76,8 @@ def getIdealParams(results):
     df = df \
             .sort_values(by='net_profit', ascending=False).head(10)
 
-    print(df)
 
     # fast = df['fast'].values
     # slow = df['slow'].values
-    # print(fast, slow)
 
     return df

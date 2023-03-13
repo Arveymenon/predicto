@@ -4,6 +4,7 @@ from kite_connect.main import KiteConnect
 import backtrader as bt
 
 from datetime import datetime
+import pandas as pd
 
 interval = "1d"  #1 days interval
 
@@ -15,7 +16,9 @@ class KiteConnectData():
         # Using custom kite connect
         kite = KiteConnect().kite
 
-        instruments = pandas.DataFrame(kite.instruments())
+        # instruments = pandas.DataFrame(kite.instruments())
+
+        instruments = pd.read_csv(r'./data/instruments.csv')
         
         exchange = symbol.split(":")[0]
         tradingsymbol = symbol.split(":")[1]

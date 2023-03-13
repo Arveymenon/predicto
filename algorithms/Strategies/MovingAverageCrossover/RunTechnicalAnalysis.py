@@ -20,10 +20,8 @@ class RunTechnicalAnalysis():
     
     def backtestMovingAverage(self, symbol, initialInvestment=INITIAL_INVESTMENT):
         # Backtesting 
-        print("Backtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
-        print("Backtesting: using 2 years old data")
 
         start_date = (datetime.now() - timedelta(days=365 * 10)).strftime("%Y-%m-%d")
         end_date = (datetime.now() - timedelta(days=365 * 1)).strftime("%Y-%m-%d")
@@ -46,7 +44,6 @@ class RunTechnicalAnalysis():
 
         cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
 
-        print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
         results = cerebro.run()
         
@@ -54,12 +51,9 @@ class RunTechnicalAnalysis():
         self.fast_ema = suggested_df['fast'].head(10).values
         self.slow_ema = suggested_df['slow'].head(10).values
 
-        print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
-        print("Backtesting: ended")
 
     def getIdealParams(self, results):
 
-        # print(results[0][0].analyzers.TAnalyzer.get_analysis())
 
         opt_results = []
 
@@ -80,10 +74,8 @@ class RunTechnicalAnalysis():
         return df
 
     def forwardtestMovingAverage(self, symbol, initialInvestment=INITIAL_INVESTMENT):
-        print("Forwardtesting: started")
         cerebro = bt.Cerebro()
         cerebro.broker.setcash(initialInvestment)
-        print("Forwardtesting: using 1 years old data")
         start_date = (datetime.now() - timedelta(days=365 * 1)).strftime("%Y-%m-%d")
         end_date = (datetime.now() - timedelta(days=365 * 0)).strftime("%Y-%m-%d")
 
@@ -100,16 +92,12 @@ class RunTechnicalAnalysis():
 
         cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
 
-        print('Forwardtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
 
         results = cerebro.run()
         
         suggested_df = self.getIdealParams(results)
 
-        print(suggested_df.iloc[0])
 
-        print('Forwardtesting: Final portfolio Value:'+ str(cerebro.broker.getvalue()))
-        print("Forwardtesting: end")
 
 
     def __init__(self, data: DataFrame) -> None:

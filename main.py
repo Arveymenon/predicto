@@ -23,18 +23,18 @@ if __name__ == "__main__":
 
     # init kite connect
     kite = KiteConnect().kite
-    # print(kite.holdings())
+
+    # get holding using kite.holdings()
     
     # backtrading init
-    # runTechnicalAnalysis = RunTechnicalAnalysis()       
-    print("If temporary path exists",os.path.exists(config["temp_files_path"]))
+    # runTechnicalAnalysis = RunTechnicalAnalysis()
     if os.path.exists(config["temp_files_path"]):
         shutil.rmtree(config["temp_files_path"])
         
     os.mkdir(config["temp_files_path"])
 
-    Shortlist()
-    Backtesting()
+    Shortlist(config)
+    Backtesting(config)
 
     # setting this will 
     # cerebro.run(broker=kite)

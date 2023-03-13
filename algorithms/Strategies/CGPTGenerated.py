@@ -39,6 +39,6 @@ class CGPTGeneratedStrategy(bt.Strategy):
                 (1 + self.params.take_profit_pct)
             self.sell(exectype=bt.Order.Limit, price=take_profit_price)
 
-        # Print some debug information
-        print(f"Close: {self.data.close[0]}, SMA: {self.sma[0]}, "
-              f"ATR: {self.atr[0]}, RSI: {self.rsi[0]}")
+        # some debug information
+        # (f"Close: {self.data.close[0]}, SMA: {self.sma[0]}, "
+        #       f"ATR: {self.atr[0]}, RSI: {self.rsi[0]}")

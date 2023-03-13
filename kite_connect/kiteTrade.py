@@ -163,7 +163,6 @@ class KiteApp:
                                        headers=self.headers).json()["data"]["order_id"]
         return order_id
 
-        # print("Market watch",market)
         # return market
 
     # payload = 

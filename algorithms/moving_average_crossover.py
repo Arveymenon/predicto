@@ -9,7 +9,6 @@ class MovingAverage():
     __short_term_ema, __long_term_ema, __Close = 'short_term_ema', 'long_term_ema', 'Close'
     
     def calculate(self):
-        print("MovingAverage:calculate function started")
         # Load the stock data into a DataFrame
         
         # TODO: NEEDS TO BE UPDATED TO WORK FOR ALL HISTORICAL DATA

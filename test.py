@@ -20,9 +20,6 @@ class SMAStrategy(bt.Strategy):
             self.sma_large_tf = btind.SMA(self.data1, period=self.p.period)
 
     def nextstart(self):
-        print('--------------------------------------------------')
-        print('nextstart called with len', len(self))
-        print('--------------------------------------------------')
 
         super(SMAStrategy, self).nextstart()
 

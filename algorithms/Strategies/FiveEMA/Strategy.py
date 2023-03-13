@@ -14,7 +14,7 @@ class Strategy(bt.Strategy):
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date()
-        print('%s, %s' % (dt.format("%Y-%m-%d %H:%M:%S"), txt))
+        # ('%s, %s' % (dt.format("%Y-%m-%d %H:%M:%S"), txt))
 
     def __init__(self):
         self.data_5min_low = self.datas[0].low
@@ -38,7 +38,7 @@ class Strategy(bt.Strategy):
                 self.count -= 1
                 print("Sold ", order.executed.size, "at ", order.executed.price, "on")
 
-            print(self.datas[0].datetime.time())
+            print(self.datas[0].datetime.datetime())
             
             # commission_info = self.broker.getcommissioninfo(data=order.data)
             # commission = commission_info.getcommission(size=order.executed.size,
