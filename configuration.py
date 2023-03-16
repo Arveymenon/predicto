@@ -4,10 +4,10 @@ from algorithms.Strategies.Shortlisting.InsideDay.InsideDay import InsideDayStra
 # from algorithms.Strategies.Shortlisting.Volitility import VolatilityStrategy
 from algorithms.Strategies.Shortlisting.MMI import MMI
 
-from algorithms.Strategies.FiveEMA.Strategy import Strategy
+from algorithms.Strategies.MACD.Strategy import Strategy
 from algorithms.Strategies.FiveEMA.Strategy2 import Strategy2
+from algorithms.Strategies.Supertrend import SupertrendStrategy
 
-# from algorithms.Strategies.Shortlisting.BBRSI import BBRSIStrategy
 config = {
     "initialInvestment": 30000,
     "temp_files_path": "./data/temp/",
@@ -17,7 +17,7 @@ config = {
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
             "start_datetime": (datetime.now() - timedelta(days = 42)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 12)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 09:00:00"),
             "intervals": ["day"],
         },
         "plot": False,
@@ -28,13 +28,13 @@ config = {
         "isActive": False,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 12)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 11)).strftime("%Y-%m-%d 16:00:00"),
+            "start_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 16:00:00"),
             "intervals": ["5minute", "15minute"],
         },
         "plot": False,
-        "strategyName": "FiveEMA",
-        "strategy": Strategy2,
+        "strategyName": "Supertrend",
+        "strategy": SupertrendStrategy,
         "optimization": False
     }
 }

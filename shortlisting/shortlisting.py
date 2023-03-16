@@ -13,7 +13,7 @@ def shortlist(
     ):
 
     # Backtesting
-    print('Shortlisting test for: %s' % symbol)
+    # print('Shortlisting test for: %s' % symbol)
     cerebro = bt.Cerebro()
     #---------------------Kite Data -------------------------#
     kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, interval = interval)

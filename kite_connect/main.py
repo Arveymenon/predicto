@@ -9,5 +9,5 @@ class KiteConnect:
 
     def __init__(self):
 
-        enctoken = "QuS9J9Sw57+/HEg5+kUUY2vkIxFX+JGVhNH260e9yX8u8wRU/+WqJ+bMv75tf7JuXTudbxIDoPEo3Iztkwsi5gr5fGc7PoZHehWcNmPAuoLdj7nQYSC9KA=="
+        enctoken = ""
         self.kite = KiteApp(enctoken=enctoken)

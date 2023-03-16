@@ -34,8 +34,9 @@ if __name__ == "__main__":
         shutil.rmtree(config["temp_files_path"])
         
     os.mkdir(config["temp_files_path"])
+    
 
-    Shortlist(config)
+    # Shortlist(config)
     Backtesting(config)
 
     # setting this will 

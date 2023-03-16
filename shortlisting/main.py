@@ -3,6 +3,8 @@ import multiprocessing as mp
 import ctypes
 
 from shortlisting.multiprocessedShortlisting import multiProcessedShortlisting
+from kite_connect.main import KiteConnect
+
 # from algorithms.Strategies.MovingAverageCrossover.Strategy import Strategy
 # from algorithms.Strategies.Shortlisting.Volitility import VolatilityStrategy
 
@@ -39,6 +41,7 @@ class Shortlist:
             config["shortlisting"]["interval"]["end_datetime"]
         ]
 
+        # self.bidAskSpread(symbols)
         multiProcessedShortlisting(
             symbols,
             shortlistingTimeFrame, datetime_format, interval,
@@ -64,3 +67,10 @@ class Shortlist:
 
         print(shortlistingTimeFrame)
         print("----------------------------------------------------------shortlisting end----------------------------------------------------------")
+
+    def bidAskSpread(self, symbols):
+        kite = KiteConnect().kite
+
+        quote = kite.quote(symbols[0])
+        print(quote)
+        

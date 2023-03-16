@@ -21,11 +21,11 @@ def hello():
     return 'Hey Guys!'
 
 def getConfig(config, start_date):
-    config["shortlisting"]["interval"]["start_datetime"] = (start_date - timedelta(days = 60)).strftime("%Y-%m-%d 09:00:00")
-    config["shortlisting"]["interval"]["end_datetime"] = (start_date  - timedelta(days = 2)).strftime("%Y-%m-%d 09:00:00")
+    config["shortlisting"]["interval"]["start_datetime"] = (start_date - timedelta(days = 30)).strftime("%Y-%m-%d 09:00:00")
+    config["shortlisting"]["interval"]["end_datetime"] = (start_date  - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00")
 
-    config["backtesting"]["interval"]["start_datetime"] = (start_date  - timedelta(days = 2)).strftime("%Y-%m-%d 09:00:00")
-    config["backtesting"]["interval"]["end_datetime"] = (start_date  - timedelta(days = 1)).strftime("%Y-%m-%d 16:00:00")
+    config["backtesting"]["interval"]["start_datetime"] = (start_date  - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00")
+    config["backtesting"]["interval"]["end_datetime"] = (start_date  - timedelta(days = 0)).strftime("%Y-%m-%d 16:00:00")
 
     return config
 
@@ -42,25 +42,26 @@ if __name__ == "__main__":
         
     os.mkdir(baseConfig["temp_files_path"])
 
-    start_date = datetime(2023, 1, 26, 18, 38, 36, 73208)
-    end_date = datetime(2023, 2, 26)
+    start_date = datetime(2022, 9, 10, 18, 38, 36, 73208)
+    end_date = datetime(2023, 3, 10)
     d = end_date - start_date
 
     config = baseConfig
-    for i in range(d.days + 1):
-        start_date += timedelta(days = i)
+    count = 0
+    for i in range(0, d.days + 1, 2):
+        current_date = start_date + timedelta(days = i)
 
-        if not isHoliday(start_date):
-            config = getConfig(config, start_date)
+        if not isHoliday(current_date):
+            config = getConfig(config, current_date)
 
             shortlist = Shortlist(config)
 
             if(len(shortlist.shortlisted_stocks) > 0):
                 backtesting = Backtesting(config)
-
+                count+=1
                 config["initialInvestment"] = backtesting.total
-
-
+        
+    print(count)
     # setting this will
     # cerebro.run(broker=kite)
 

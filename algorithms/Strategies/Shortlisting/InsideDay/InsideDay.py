@@ -25,8 +25,10 @@ class InsideDayStrategy(bt.Strategy):
 
     
     def stop(self):
-        if (self.data.high[0-1] <= self.data.high[-2-1] and self.data.high[-1-1] <= self.data.high[-2-1] and \
-            self.data.low[0-1] >= self.data.low[-2-1] and self.data.low[-1-1] >= self.data.low[-2-1]):
+        if (self.data.high[0] <= self.data.high[-2] and self.data.high[-1] <= self.data.high[-2] and \
+            self.data.low[0] >= self.data.low[-2] and self.data.low[-1] >= self.data.low[-2]):
+        # if (self.data.high[0-1] <= self.data.high[-2-1] and self.data.high[-1-1] <= self.data.high[-2-1] and \
+        #     self.data.low[0-1] >= self.data.low[-2-1] and self.data.low[-1-1] >= self.data.low[-2-1]):
             #  (self.data.high[0-1] <= self.data.high[-2-1] and self.data.high[-1-1] <= self.data.high[-2-1] and self.data.low[0-1] >= self.data.low[-2-1] and self.data.low[-1-1] >= self.data.low[-2-1]):
             
             # if self.data.low[-1] < self.lower[-1] and self.rsi[-1] < 30 or \

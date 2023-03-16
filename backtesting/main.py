@@ -61,6 +61,7 @@ class Backtesting:
             #     )
             results = []
             budget = config["initialInvestment"]/len(symbols)
+            # TODO: replace config["initialInvestment"] with budget in backtest()
             for symbol in symbols :
                 back_tested_data = backtest(
                         symbol,
@@ -70,7 +71,9 @@ class Backtesting:
                         plot=config["backtesting"]["plot"],
                         optimization_params=None
                     )
-                results.append([back_tested_data['symbol'], back_tested_data['value']])
+                
+                if back_tested_data != None and len(back_tested_data) :
+                    results.append([back_tested_data['symbol'], back_tested_data['value']])
                 
             df = pd.DataFrame(results, columns = ["symbol", "value"])
 

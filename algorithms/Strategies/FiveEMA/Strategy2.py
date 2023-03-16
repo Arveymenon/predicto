@@ -11,8 +11,8 @@ from math import floor
 # Create a Stratey
 class Strategy2(bt.Strategy):
     params = (
-        ('stop_loss', 0.01),
-        ('book_profit', 0.03)
+        ('stop_loss', 0.003),
+        ('book_profit', 0.02)
     )
 
     def log(self, txt, dt=None):
@@ -85,27 +85,31 @@ class Strategy2(bt.Strategy):
             # if(self.position):
                 
                    
-        
-        # if(self.position):
-        #     last_trade_price = self.trades[-1][3]
+        # Stop Loss And Book Profit
+        if(self.position):
+            last_trade_price = self.trades[-1][3]
 
-        #     if self.position.size > 0:
-        #         stop_loss = last_trade_price - self.params.stop_loss*last_trade_price
-        #         if(self.data_5min_low[0] <= stop_loss):
-        #             self.close()
+            if self.position.size > 0:
+                # stop_loss = last_trade_price - self.params.stop_loss*last_trade_price
+                # if(self.data_5min_low[0] <= stop_loss):
+                #     self.close()
 
-        #         book_profit = last_trade_price - self.params.book_profit*last_trade_price
-        #         if(self.data_5min_low[0] >= book_profit):
-        #             self.close()
+                book_profit = last_trade_price - self.params.book_profit*last_trade_price
+                if(self.data_5min_low[0] >= book_profit):
+                    print(self.data_5min_low[0])
+                    self.trade = False
+                    self.close()
 
-        #     if self.position.size < 0:
-        #         stop_loss = last_trade_price + self.params.stop_loss*last_trade_price
-        #         if(self.data_5min_low[0] > stop_loss):
-        #             self.close()
+            if self.position.size < 0:
+                # stop_loss = last_trade_price + self.params.stop_loss*last_trade_price
+                # if(self.data_5min_low[0] > stop_loss):
+                #     self.close()
 
-        #         book_profit = last_trade_price - self.params.book_profit*last_trade_price
-        #         if(self.data_5min_low[0] > book_profit):
-        #             self.close()
+                book_profit = last_trade_price - self.params.book_profit*last_trade_price
+                if(self.data_5min_low[0] <= book_profit):
+                    print(self.data_5min_low[0])
+                    self.trade = False
+                    self.close()
 
 
         # important for day end closing
@@ -113,7 +117,6 @@ class Strategy2(bt.Strategy):
             self.trade = False
 
             print("Day end close")
-            print("Day end cash", self.broker.cash)
             print("Day end value", self.broker.getvalue())
             if(self.position.size < 0):
                 self.close()

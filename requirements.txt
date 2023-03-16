@@ -6,7 +6,6 @@ asyncio==3.4.3
 attrs==22.2.0
 autobahn==19.11.2
 Automat==22.10.0
-backtrader @ git+https://github.com/mementum/backtrader.git@0fa63ef4a35dc53cc7320813f8b15480c8f85517
 backtrader-plotting==2.0.0
 beautifulsoup4==4.11.1
 bokeh==2.3.3
