@@ -4,9 +4,11 @@ from algorithms.Strategies.Shortlisting.InsideDay.InsideDay import InsideDayStra
 # from algorithms.Strategies.Shortlisting.Volitility import VolatilityStrategy
 from algorithms.Strategies.Shortlisting.MMI import MMI
 
-from algorithms.Strategies.MACD.Strategy import Strategy
-from algorithms.Strategies.FiveEMA.Strategy2 import Strategy2
-from algorithms.Strategies.Supertrend import SupertrendStrategy
+# from algorithms.Strategies.MACD.Strategy import Strategy
+# from algorithms.Strategies.FiveEMA.Strategy2 import Strategy2
+
+from algorithms.Strategies.VWAP import VWAPStrategy
+from algorithms.Strategies.VWAPMACDSuperTrend import VWAPMACDSuperTrendStrategy
 
 config = {
     "initialInvestment": 30000,
@@ -17,7 +19,7 @@ config = {
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
             "start_datetime": (datetime.now() - timedelta(days = 42)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00"),
             "intervals": ["day"],
         },
         "plot": False,
@@ -28,13 +30,13 @@ config = {
         "isActive": False,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d 16:00:00"),
-            "intervals": ["5minute", "15minute"],
+            "start_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 16:00:00"),
+            "intervals": ["5minute"],
         },
-        "plot": False,
-        "strategyName": "Supertrend",
-        "strategy": SupertrendStrategy,
+        "plot": True,
+        "strategyName": "VWAPMACDSuperTrendStrategy",
+        "strategy": VWAPMACDSuperTrendStrategy,
         "optimization": False
     }
 }

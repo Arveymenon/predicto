@@ -5,6 +5,8 @@ from backtesting.commission import ZerodhaCommission
 from Indicators.SuperTrend import SuperTrend
 from pandas import DataFrame
 
+from Indicators.VWAP import VWAP
+
 def backtest(
         symbol, 
         start_date, end_date, datetime_format, interval,
@@ -25,38 +27,38 @@ def backtest(
     
     #---------------------Kite Data -------------------------#
     kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, interval = interval)
-    try:
-        if kiteConnectData.success:
+    # try:
+    if kiteConnectData.success:
 
-            for data in kiteConnectData.datas:
-                cerebro.adddata(data)
-                # cerebro.adddata(kiteConnectData.data2)
+        
+        for data in kiteConnectData.datas:
+            cerebro.adddata(data)
+            # cerebro.adddata(kiteConnectData.data2)
 
-        #-------------------- Kite data end --------------------------#
+    #-------------------- Kite data end --------------------------#
 
-            # # Define the optimization parameters and ranges
-            if optimization_params == None:
-                cerebro.addstrategy(Strategy)
-                
-                print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
-                cerebro.run()
+        # # Define the optimization parameters and ranges
+        if optimization_params == None:
+            cerebro.addstrategy(Strategy)
+            
+            print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
+            cerebro.run()
 
-                if(plot):
-                    # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
-                    cerebro.plot(iplot=True, volume=False, style='candlestick')
-                    # cerebro.plot()
+            if(plot):
+                # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
+                cerebro.plot(style='candlestick', subplot=False)
 
-                print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
+            print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-                return {"symbol": symbol, "value": cerebro.broker.getvalue()}
+            return {"symbol": symbol, "value": cerebro.broker.getvalue()}
 
-            else:
-                cerebro.optstrategy(Strategy, **optimization_params)
-                cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
-                results = cerebro.run()
-                return getIdealParams(results)
-    except:
-        print("Error back testing")
+        else:
+            cerebro.optstrategy(Strategy, **optimization_params)
+            cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
+            results = cerebro.run()
+            return getIdealParams(results)
+    # except:
+    #     print("Error back testing")
 
 
 def getIdealParams(results):

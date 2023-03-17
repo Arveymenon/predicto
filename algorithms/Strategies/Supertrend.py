@@ -61,13 +61,6 @@ class SupertrendStrategy(bt.Strategy):
                 
                 self.trades.append([self.datas[0].datetime.datetime(), "sell", order.executed.size, order.executed.price])
                 
-    # def notify_trade(self, trade):
-    #     if trade.isclosed:
-    #         self.log('TRADE PROFIT: EQ %s, GROSS %.2f, NET %.2f' %
-    #                  ('Closed'  , trade.pnl, trade.pnlcomm))
-    #     elif trade.justopened:
-    #         self.log('TRADE OPENED: EQ %s, SIZE %2d' % (  'Opened'  , trade.size))
-                
     def next(self):
         pos = self.getposition(self.data)
         dpos = pos.size

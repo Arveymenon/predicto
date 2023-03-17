@@ -26,7 +26,7 @@ class Backtesting:
 
 
         datetime_format = "%Y-%m-%d %H:%M:%S"
-        interval = ["5minute", "15minute"]
+        interval = config["backtesting"]["interval"]["intervals"]
 
         backtestTimeFrame = [
             config["backtesting"]["interval"]["start_datetime"],
