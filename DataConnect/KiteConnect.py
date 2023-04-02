@@ -17,6 +17,7 @@ class KiteConnectData():
         kite = KiteConnect().kite
 
         # instruments = pandas.DataFrame(kite.instruments())
+        # instruments.to_csv(r'./data/instruments.csv')
 
         instruments = pd.read_csv(r'./data/instruments.csv')
         

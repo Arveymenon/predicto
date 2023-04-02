@@ -5,7 +5,8 @@ from backtesting.commission import ZerodhaCommission
 from Indicators.SuperTrend import SuperTrend
 from pandas import DataFrame
 
-from Indicators.VWAP import VWAP
+from analyzers.commissions import CommissionsAnalyzer
+from analyzers.totalValue import TotalValueAnalyzer
 
 def backtest(
         symbol, 
@@ -13,7 +14,7 @@ def backtest(
         Strategy,
         initialInvestment,
         plot = False, 
-        optimization_params = None, 
+        optimization_params = False, 
     ):
 
     # Backtesting
@@ -27,38 +28,56 @@ def backtest(
     
     #---------------------Kite Data -------------------------#
     kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, interval = interval)
-    # try:
-    if kiteConnectData.success:
+    try:
+        if kiteConnectData.success:
 
-        
-        for data in kiteConnectData.datas:
-            cerebro.adddata(data)
-            # cerebro.adddata(kiteConnectData.data2)
-
-    #-------------------- Kite data end --------------------------#
-
-        # # Define the optimization parameters and ranges
-        if optimization_params == None:
-            cerebro.addstrategy(Strategy)
             
+            for data in kiteConnectData.datas:
+                cerebro.adddata(data)
+
+            
+
+        #-------------------- Kite data end --------------------------#
+
             print('Backtesting: Starting portfolio Value: %.2f' % cerebro.broker.getvalue())
-            cerebro.run()
+
+            # # Define the optimization parameters and ranges
+            if optimization_params == False:
+                cerebro.addstrategy(Strategy)
+                cerebro.run()
+
+            else:
+                cerebro.optstrategy(Strategy)
+                cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
+                cerebro.addanalyzer(TotalValueAnalyzer, _name="TotalValueAnalyzer")
+                cerebro.addanalyzer(CommissionsAnalyzer, _name="CommissionAnalyzer")
+                
+
+                results = cerebro.run()
 
             if(plot):
                 # cerebro.plot(iplot=True, volume=False, style='bar', rows=2, cols=1, name=['macd'])
                 cerebro.plot(style='candlestick', subplot=False)
 
-            print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-            return {"symbol": symbol, "value": cerebro.broker.getvalue()}
+            if(optimization_params == False):
 
-        else:
-            cerebro.optstrategy(Strategy, **optimization_params)
-            cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="TAnalyzer")
-            results = cerebro.run()
-            return getIdealParams(results)
-    # except:
-    #     print("Error back testing")
+                print('Backtesting: Final portfolio Value: %.2f' % cerebro.broker.getvalue())
+                return {"symbol": symbol, "value": cerebro.broker.getvalue()}
+
+            else:
+                commission_analyzers = results[0][0].analyzers.CommissionAnalyzer
+                total_value_analyzers = results[0][0].analyzers.TotalValueAnalyzer
+
+                print(f"Commission paid: {commission_analyzers.total_commission:.2f}")
+                print("Net profit: %s" %results[0][0].analyzers.TAnalyzer.get_analysis()["pnl"]["net"]["total"])
+                print('Backtesting: Final portfolio Value: %i' % total_value_analyzers.total_value)
+                
+                return {"symbol": symbol, "value": total_value_analyzers.total_value}
+
+    except Exception as e:
+        print(f"Error back testing: {e}")
+        return {"symbol": symbol, "value": initialInvestment}
 
 
 def getIdealParams(results):

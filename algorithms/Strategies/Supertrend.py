@@ -6,6 +6,11 @@ from Indicators.SuperTrend import SuperTrend
 from math import floor
 
 class SupertrendStrategy(bt.Strategy):
+    params = (
+        ('stop_loss', 0.002),
+        ('book_profit', 0.06)
+    )
+
     def log(self, txt, dt=None):
         if  True:
             dt = dt or self.datas[0].datetime.date(0)
@@ -14,7 +19,7 @@ class SupertrendStrategy(bt.Strategy):
     def __init__(self):
         self.x = SuperTrend(self.data)
         self.dclose = self.datas[0].close
-        self.cross = bt.ind.CrossOver(self.dclose, self.x)
+        self.cross = bt.ind.CrossOver(self.dclose, self.x) 
         self.trades = []
 
     
@@ -62,16 +67,47 @@ class SupertrendStrategy(bt.Strategy):
                 self.trades.append([self.datas[0].datetime.datetime(), "sell", order.executed.size, order.executed.price])
                 
     def next(self):
-        pos = self.getposition(self.data)
-        dpos = pos.size
-        if self.cross[0]==1 and dpos <= 0:
+
+        if self.cross[0]==1:
             # self.order_target_percent(data=self.data, target=1)
-            size = floor(self.broker.cash/self.datas[0].close[0])
-            self.order = self.buy(size=size, data=self.datas[0])
-        elif self.cross[0]==-1 and dpos >= 0:
-            # self.order_target_percent(data=self.data, target=-1)
-            size = floor(self.broker.cash/self.datas[0].close[0])
-            self.order = self.sell(size=size, data=self.datas[0])
+            if(not self.position):
+                size = floor(self.broker.cash/self.datas[0].close[0])
+                self.order = self.buy(size=size, data=self.datas[0])
+            elif(self.position.size < 0):
+                self.close()
+        elif self.cross[0]==-1:
+            if(not self.position):
+                size = floor(self.broker.cash/self.datas[0].close[0])
+                self.order = self.sell(size=size, data=self.datas[0])
+            elif(self.position.size > 0):
+                self.close()
+
+        
+        # Stop Loss And Book Profit
+        if(self.position):
+            last_trade_price = self.trades[-1][3]
+
+            if self.position.size > 0:
+                stop_loss = last_trade_price - self.params.stop_loss*last_trade_price
+                if(self.datas[0].close[0] <= stop_loss):
+                    self.close()
+
+                book_profit = last_trade_price - self.params.book_profit*last_trade_price
+                if(self.datas[0].close[0] >= book_profit):
+                    print(self.datas[0].close[0])
+                    self.trade = False
+                    self.close()
+
+            if self.position.size < 0:
+                stop_loss = last_trade_price + self.params.stop_loss*last_trade_price
+                if(self.datas[0].close[0] > stop_loss):
+                    self.close()
+
+                book_profit = last_trade_price - self.params.book_profit*last_trade_price
+                if(self.datas[0].close[0] <= book_profit):
+                    print(self.datas[0].close[0])
+                    self.trade = False
+                    self.close()
 
     
     def stop(self):

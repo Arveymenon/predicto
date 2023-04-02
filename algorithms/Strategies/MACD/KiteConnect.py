@@ -67,4 +67,4 @@ class KiteConnectData():
             self.datas = [self.data, self.data2]
             self.success = True
         except:
-            print('Some error occoured for %s', symbol)
+            print('Some error occoured in MACD for %s', symbol)

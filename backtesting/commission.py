@@ -11,7 +11,19 @@ class ZerodhaCommission(bt.CommInfoBase):
     def getsize(self, price, cash):
         return self.p.leverage * (cash / price)
 
+
     def _getcommission(self, size, price, pseudoexec, *args, **kwargs):
+        print(self.p.commission, self.p.commissionpct)
+        commission = self.p.commission
+        commissionpct = self.p.commissionpct
+        value = abs(size) * price
+        if value * commissionpct < commission:
+            commission = value * commissionpct
+        return commission
+
+
+    def _getbrokercommissions(self, size, price, pseudoexec, *args, **kwargs):
+        print(self.p.commission, self.p.commissionpct)
         commission = self.p.commission
         commissionpct = self.p.commissionpct
         value = abs(size) * price

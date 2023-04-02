@@ -2,8 +2,11 @@ import backtrader as bt
 class VWAP(bt.Indicator):
     lines = ('vwap',)
     params = (('period', 30),)
-    plotinfo = dict(subplot=False)
     
+    plotinfo = dict(subplot=False)
+    new_plotinfo = dict(plot=dict(color='red'))
+    plotinfo.update(new_plotinfo)
+
     def __init__(self):
         self.cumulative_volume = 0.0
         self.cumulative_price_volume = 0.0

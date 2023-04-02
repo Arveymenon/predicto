@@ -25,7 +25,7 @@ def shortlist(
 
     #-------------------- Kite data end --------------------------#
 
-        cerebro.addstrategy(Strategy, symbol=symbol, shortlisted_stocks= shortlisted_stocks)
+        cerebro.addstrategy(Strategy, symbol=symbol, shortlisted_stocks=shortlisted_stocks)
         
         cerebro.run()
 

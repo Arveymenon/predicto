@@ -11,8 +11,8 @@ from math import floor
 # Create a Stratey
 class Strategy2(bt.Strategy):
     params = (
-        ('stop_loss', 0.003),
-        ('book_profit', 0.02)
+        ('stop_loss', 0.02),
+        ('book_profit', 0.06)
     )
 
     def log(self, txt, dt=None):
@@ -38,9 +38,16 @@ class Strategy2(bt.Strategy):
             self.order = None
             if (order.isbuy()):
                 self.trades.append([self.datas[0].datetime.datetime(), "buy", order.executed.size, order.executed.price])
+                if self.position:
+                    self.stop_loss = order.executed.price - order.executed.price * self.params.stop_loss
+
                 print("Bought ", order.executed.size, "at ", order.executed.price, "on")
+
             elif (order.issell()):
                 self.trades.append([self.datas[0].datetime.datetime(), "sell", order.executed.size, order.executed.price])
+                if self.position:
+                    self.stop_loss = order.executed.price + order.executed.price * self.params.stop_loss
+
                 print("Sold ", order.executed.size, "at ", order.executed.price, "on")
 
             print(self.datas[0].datetime.datetime())
@@ -63,7 +70,7 @@ class Strategy2(bt.Strategy):
         #     return
         ### ----------------------------------------------
 
-        if(str(self.datas[0].datetime.time()) == str('11:00:00')):
+        if(str(self.datas[0].datetime.time()) == str('09:30:00')):
             self.trade = True
 
         # if(self.trade_today and self.day_count > 2):
@@ -85,31 +92,38 @@ class Strategy2(bt.Strategy):
             # if(self.position):
                 
                    
-        # Stop Loss And Book Profit
+        # Trailing Stop Loss And Book Profit
         if(self.position):
             last_trade_price = self.trades[-1][3]
 
             if self.position.size > 0:
-                # stop_loss = last_trade_price - self.params.stop_loss*last_trade_price
-                # if(self.data_5min_low[0] <= stop_loss):
-                #     self.close()
+                self.stop_loss = last_trade_price - self.params.stop_loss*last_trade_price
+                if(self.data_5min_low[0] <= self.stop_loss):
+                    self.close()
+                    self.stop_loss = None
+                else:
+                    self.stop_loss = max(self.stop_loss, self.params.stop_loss*self.datas[0].close[0])
 
-                book_profit = last_trade_price - self.params.book_profit*last_trade_price
+                book_profit = last_trade_price + self.params.book_profit*last_trade_price
                 if(self.data_5min_low[0] >= book_profit):
                     print(self.data_5min_low[0])
                     self.trade = False
                     self.close()
 
             if self.position.size < 0:
-                # stop_loss = last_trade_price + self.params.stop_loss*last_trade_price
-                # if(self.data_5min_low[0] > stop_loss):
-                #     self.close()
+                self.stop_loss = last_trade_price + self.params.stop_loss*last_trade_price
+                if(self.data_5min_low[0] > self.stop_loss):
+                    self.close()
+                    self.stop_loss = None
+                else:
+                    self.stop_loss = min(self.stop_loss, self.params.stop_loss * self.datas[0].close[0])
 
                 book_profit = last_trade_price - self.params.book_profit*last_trade_price
                 if(self.data_5min_low[0] <= book_profit):
                     print(self.data_5min_low[0])
                     self.trade = False
                     self.close()
+        
 
 
         # important for day end closing
@@ -120,8 +134,12 @@ class Strategy2(bt.Strategy):
             print("Day end value", self.broker.getvalue())
             if(self.position.size < 0):
                 self.close()
+            
+        if len(self.datas[0]) - 6 == self.datas[0].buflen() - 6:
+            self.close()
 
     def stop(self):
         all_trades = pd.DataFrame(self.trades,columns=["datetime",'type', "size", "price"])
+        self.close()
         print("trades",all_trades)
         print("Position", self.position)

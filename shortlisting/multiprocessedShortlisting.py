@@ -6,17 +6,25 @@ def multiProcessedShortlisting(
             backtestTimeFrame, datetime_format, interval, 
             strategy,
             shortlisted_stocks,
-            plot
+            plot = False
         ):
-         # ---------------------- Back testing ---------------------------#
+         # ---------------------- Shortlisting testing ---------------------------#
 
             pool = multiprocessing.Pool()
-            args = [(symbol, 
-                     backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
+            start_date = backtestTimeFrame[0]
+            end_date = backtestTimeFrame[1]
+            
+            args = [(symbol,
+                     start_date, end_date, datetime_format, interval,
                      strategy,
                      shortlisted_stocks,
                      plot
                      ) for symbol in symbols]
-            pool.starmap(shortlist, args)
-            pool.close()
-            pool.join()
+            
+            try:
+                pool.starmap(shortlist, args)
+            except Exception as e:
+                print(f"Error: {e}")
+            finally:
+                pool.close()
+                pool.join()

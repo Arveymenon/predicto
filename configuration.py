@@ -5,44 +5,51 @@ from algorithms.Strategies.Shortlisting.InsideDay.InsideDay import InsideDayStra
 from algorithms.Strategies.Shortlisting.MMI import MMI
 
 # from algorithms.Strategies.MACD.Strategy import Strategy
-# from algorithms.Strategies.FiveEMA.Strategy2 import Strategy2
+from algorithms.Strategies.FiveEMA.Strategy2 import Strategy2
 
+from algorithms.Strategies.Supertrend import SupertrendStrategy
 from algorithms.Strategies.VWAP import VWAPStrategy
 from algorithms.Strategies.VWAPMACDSuperTrend import VWAPMACDSuperTrendStrategy
 
+from enum import Enum
+# class budgetDistribution(Enum):
+#     linear = 0
+#     none = 1
+BudgetDistribution = Enum("BudgetDistribution", ["linear", "none"])
+
+# backtesting will be done on {shortlisting.strategyName} + "." + {inputFile}
 config = {
     "initialInvestment": 30000,
-    "temp_files_path": "./data/temp/",
-    "input_file": "nsesmallcap100",
+    "tempFilesPath": "./data/temp/",
+    "inputFile": "nsesmallcap100",
+    "exchange": "NSE",
+    "budgetDistribution": BudgetDistribution.linear,
     "shortlisting": {
-        "isActive": False,
+        "isActive": True,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 42)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00"),
+            "start_datetime": (datetime.now() - timedelta(days = 30)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"), 
             "intervals": ["day"],
         },
         "plot": False,
-        "strategyName": "insideDay",
+        "strategyName": "InsideDay",
         "strategy": InsideDayStrategy
     },
     "backtesting": {
-        "isActive": False,
+        "isActive": True,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 1)).strftime("%Y-%m-%d 16:00:00"),
-            "intervals": ["5minute"],
+            "start_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 3)).strftime("%Y-%m-%d 16:00:00"),
+            "intervals": ["5minute", "15minute"],
         },
-        "plot": True,
-        "strategyName": "VWAPMACDSuperTrendStrategy",
-        "strategy": VWAPMACDSuperTrendStrategy,
-        "optimization": False
+        "plot": False,
+        "strategyName": "FiveEMA",
+        "strategy": Strategy2,
+        "optimization": True
     }
 }
-
-def getInputfile():
-    return config["input_file"]
 
 
 def getConfig(backtest_start_date):
@@ -57,23 +64,3 @@ def getConfig(backtest_start_date):
     new_config["backtesting"]["interval"]["end_datetime"] = (now - timedelta(days = 0)).strftime("%Y-%m-%d 09:30:00")
 
     return new_config
-
-# "forwardtesting": {
-#     "isActive": True,
-#     "interval": {
-#         "datetime_format": "%Y-%m-%d %H:%M:%S",
-#         "start_datetime": (datetime.now() - timedelta(days = 4)).strftime("%Y-%m-%d %H:%M:%S"),
-#         "end_datetime": (datetime.now() - timedelta(days = 0)).strftime("%Y-%m-%d %H:%M:%S"),
-#         "intervals": ["day"],
-#     },
-#     "plot": True,
-#     "strategyName": "insideDay",
-#     "strategy": Strategy
-# }
-
-
-# "start_datetime": (datetime.now() - timedelta(days = 40)).strftime("%Y-%m-%d 09:15:00"),
-# "end_datetime": (datetime.now() - timedelta(days = 10)).strftime("%Y-%m-%d 03:30:00"),
-
-# "start_datetime": (datetime.now() - timedelta(days = 9)).strftime("%Y-%m-%d 09:15:00"),
-# "end_datetime": (datetime.now() - timedelta(days = 8)).strftime("%Y-%m-%d 03:30:00"),

@@ -16,116 +16,62 @@ class Backtesting:
 
     def __init__(self ,config) -> None:
         shortlist = config["shortlisting"]["strategyName"]
-        dataSetFileName = config["input_file"]
-        algo = config["backtesting"]["strategyName"]
+        self.dataSetFileName = config["inputFile"]
+        self.algo = config["backtesting"]["strategyName"]
 
-        df = pd.read_csv(r'./data/responseData/shortlist/'+shortlist+"."+dataSetFileName+'.csv')
-        df['Symbol'] = 'NSE:'+ df['Symbol']
+        df = pd.read_csv(r'./data/responseData/shortlist/'+shortlist+"."+self.dataSetFileName+'.csv')
+        # df['Symbol'] = 'NSE:'+ df['Symbol']
+        df['Symbol'] = config['exchange']+":"+df['Symbol']
         symbols = df['Symbol'].to_list()
-        # symbols = ["NSE:PATANJALI-BE"]
 
 
         datetime_format = "%Y-%m-%d %H:%M:%S"
-        interval = config["backtesting"]["interval"]["intervals"]
 
         backtestTimeFrame = [
             config["backtesting"]["interval"]["start_datetime"],
             config["backtesting"]["interval"]["end_datetime"]
         ]
 
-        forwardTimeFrame = []
+        optimization_params = config["backtesting"]["optimization"]
 
-        optimization_params = None
-        # optimization_params = {
-        #     # 'test': True
-        # }
-        # "fast": range(5,10),
-        # "slow": range(15,30)
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+        # comment out for multiprocessing (Cannot be used with optStrategy) # #
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-        # multiprocessedBacktesting \
-        #                 .multiProcessedBacktest(
-        #                     symbols,
-        #                     datetime_format, interval, 
-        #                     Strategy, backtestTimeFrame,True, forwardTimeFrame,
-        #                     plot = False, 
-        #                     optimization_params=optimization_params
-        #                 )
-
-        if(optimization_params == None):
-            # back_tested_data = backtest(
-            #         symbol,
-            #         backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
-            #         Strategy,
-            #         plot=True,
-            #         optimization_params=None
-            #     )
+        if(not optimization_params):
+            self.total = multiprocessedBacktesting \
+                            .multiProcessedBacktest(
+                                symbols,
+                                backtestTimeFrame,
+                                datetime_format,
+                                self.generateResponse
+                            )
+        else:
             results = []
             budget = config["initialInvestment"]/len(symbols)
-            # TODO: replace config["initialInvestment"] with budget in backtest()
+            # #### TODO: replace config["initialInvestment"] with budget in backtest()
             for symbol in symbols :
                 back_tested_data = backtest(
                         symbol,
-                        backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval,
+                        backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, config["backtesting"]["interval"]["intervals"],
                         config["backtesting"]["strategy"],
                         budget,
-                        plot=config["backtesting"]["plot"],
-                        optimization_params=None
+                        config["backtesting"]["plot"],
+                        True
                     )
                 
                 if back_tested_data != None and len(back_tested_data) :
                     results.append([back_tested_data['symbol'], back_tested_data['value']])
-                
-            df = pd.DataFrame(results, columns = ["symbol", "value"])
 
-            df = df.sort_values(by='value', ascending=False)
-            print(df)
-            self.total = df["value"].sum()
-            print(self.total)
-            df.to_csv("./data/responseData/backtest/"+dataSetFileName+"."+algo+".csv")
+            self.generateResponse(results)
 
-        else:
-            # "fast", "slow", "stop_loss", "take_profit",
-            optimum_params = pd.DataFrame([], columns = [
-                                                "symbol", "net_profit", 'won_total', 'lost_total'])
-            for symbol in symbols:
-                back_tested_data = backtest(
-                    symbol,
-                    backtestTimeFrame[0], backtestTimeFrame[1], datetime_format, interval, 
-                    config["backtesting"]["interval"]["strategy"],
-                    plot=False,
-                    optimization_params=optimization_params
-                )
+    def generateResponse(self, results):
+        df = pd.DataFrame(results, columns = ["symbol", "value"])
 
-                if(not back_tested_data.empty):
-                    back_tested_data["symbol"] = symbol
-
-                    # If only backtesting is required
-                    # optimum_params = optimum_params.append(back_tested_data.iloc[0],ignore_index=True)
-
-                    # forward testing 
-                    # "fast": back_tested_data["fast"],
-                    # "slow": back_tested_data["slow"]
-                    forward_test_optimization_param = {
-                        'test': True
-                    }
-
-                    forward_tested_data = backtest(
-                        symbol,
-                        forwardTimeFrame[0], forwardTimeFrame[1], datetime_format, interval, 
-                        Strategy,
-                        plot=True,
-                        optimization_params=forward_test_optimization_param
-                    )
-
-                    if(not forward_tested_data.empty):
-                        # optimum_params.loc[symbol] = forward_tested_data
-                        forward_tested_data["symbol"] = symbol
-                        optimum_params = optimum_params.append(forward_tested_data.iloc[0],ignore_index=True)
-
-
-            optimum_params = optimum_params.sort_values(by='net_profit', ascending=False)
-            optimum_params.to_csv("./data/responseData/MovingAverageCrossover."+dataSetFileName+".csv")
-
-
+        df = df.sort_values(by='value', ascending=False)
+        print(df)
+        self.total = df["value"].sum()
+        print(self.total)
+        df.to_csv("./data/responseData/backtest/"+self.dataSetFileName+"."+self.algo+".csv")
 
 
