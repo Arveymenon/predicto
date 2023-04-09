@@ -1,6 +1,6 @@
 import backtrader as bt
 
-from DataConnect.KiteConnect import KiteConnectData
+from DataConnect.KiteConnectData import KiteConnectData
 
 # from Indicators.MMI import MMI
 

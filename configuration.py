@@ -19,17 +19,18 @@ BudgetDistribution = Enum("BudgetDistribution", ["linear", "none"])
 
 # backtesting will be done on {shortlisting.strategyName} + "." + {inputFile}
 config = {
-    "initialInvestment": 30000,
+    "liveTrade": False,
+    "initialInvestment": 100,
     "tempFilesPath": "./data/temp/",
     "inputFile": "nsesmallcap100",
     "exchange": "NSE",
     "budgetDistribution": BudgetDistribution.linear,
     "shortlisting": {
-        "isActive": True,
+        "isActive": False,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 30)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"), 
+            "start_datetime": (datetime.now() - timedelta(days = 8)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 6)).strftime("%Y-%m-%d 09:00:00"),
             "intervals": ["day"],
         },
         "plot": False,
@@ -40,8 +41,8 @@ config = {
         "isActive": True,
         "interval": {
             "datetime_format": "%Y-%m-%d %H:%M:%S",
-            "start_datetime": (datetime.now() - timedelta(days = 5)).strftime("%Y-%m-%d 09:00:00"),
-            "end_datetime": (datetime.now() - timedelta(days = 3)).strftime("%Y-%m-%d 16:00:00"),
+            "start_datetime": (datetime.now() - timedelta(days = 4)).strftime("%Y-%m-%d 09:00:00"),
+            "end_datetime": (datetime.now() - timedelta(days = 2)).strftime("%Y-%m-%d 16:00:00"),
             "intervals": ["5minute", "15minute"],
         },
         "plot": False,
