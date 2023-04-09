@@ -21,6 +21,10 @@ class Strategy2(bt.Strategy):
         print('%s, %s' % (dt.format("%Y-%m-%d %H:%M:%S"), txt))
 
     def __init__(self):
+        self.data_live = self.datas[0]
+        self.data_live.timeframe = bt.TimeFrame.Minutes
+        self.data_live.timeframeperiod = 5
+
         self.data_5min_low = self.datas[0].low
         self.data_15min_high = self.datas[1].high
 
@@ -37,14 +41,14 @@ class Strategy2(bt.Strategy):
             # self.log("Executed {}".format(order.executed.price))
             self.order = None
             if (order.isbuy()):
-                self.trades.append([self.datas[0].datetime.datetime(), "buy", order.executed.size, order.executed.price])
+                self.trades.append([self.datas[0].datetime.datetime(), "buy", order.executed.size, order.executed.price, order.executed.comm])
                 if self.position:
                     self.stop_loss = order.executed.price - order.executed.price * self.params.stop_loss
 
                 print("Bought ", order.executed.size, "at ", order.executed.price, "on")
 
             elif (order.issell()):
-                self.trades.append([self.datas[0].datetime.datetime(), "sell", order.executed.size, order.executed.price])
+                self.trades.append([self.datas[0].datetime.datetime(), "sell", order.executed.size, order.executed.price, order.executed.comm])
                 if self.position:
                     self.stop_loss = order.executed.price + order.executed.price * self.params.stop_loss
 
@@ -106,7 +110,6 @@ class Strategy2(bt.Strategy):
 
                 book_profit = last_trade_price + self.params.book_profit*last_trade_price
                 if(self.data_5min_low[0] >= book_profit):
-                    print(self.data_5min_low[0])
                     self.trade = False
                     self.close()
 
@@ -120,7 +123,6 @@ class Strategy2(bt.Strategy):
 
                 book_profit = last_trade_price - self.params.book_profit*last_trade_price
                 if(self.data_5min_low[0] <= book_profit):
-                    print(self.data_5min_low[0])
                     self.trade = False
                     self.close()
         
@@ -139,7 +141,7 @@ class Strategy2(bt.Strategy):
             self.close()
 
     def stop(self):
-        all_trades = pd.DataFrame(self.trades,columns=["datetime",'type', "size", "price"])
+        all_trades = pd.DataFrame(self.trades,columns=["datetime",'type', "size", "price", "commission"])
         self.close()
         print("trades",all_trades)
         print("Position", self.position)

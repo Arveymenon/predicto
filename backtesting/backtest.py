@@ -1,16 +1,18 @@
 import backtrader as bt
 
-from DataConnect.KiteConnect import KiteConnectData
+from DataConnect.KiteConnectData import KiteConnectData
 from backtesting.commission import ZerodhaCommission
 from Indicators.SuperTrend import SuperTrend
 from pandas import DataFrame
+
+from broker.ZerodhaBroker import ZerodhaBroker
 
 from analyzers.commissions import CommissionsAnalyzer
 from analyzers.totalValue import TotalValueAnalyzer
 
 def backtest(
         symbol, 
-        start_date, end_date, datetime_format, interval,
+        start_date, end_date, datetime_format, intervals,
         Strategy,
         initialInvestment,
         plot = False, 
@@ -20,14 +22,15 @@ def backtest(
     # Backtesting
     print("Backtesting: started for "+ symbol)
     cerebro = bt.Cerebro()
-    cerebro.broker.setcash(initialInvestment)
 
+    # cerebro.setbroker(ZerodhaBroker())
+    cerebro.broker.setcash(cash = initialInvestment)
     cerebro.broker.setcommission(commission=0.0)  # Disable default commission
     cerebro.broker.addcommissioninfo(ZerodhaCommission())
 
     
     #---------------------Kite Data -------------------------#
-    kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, interval = interval)
+    kiteConnectData = KiteConnectData(datetime_format, symbol, fromDate=start_date, toDate=end_date, intervals = intervals)
     try:
         if kiteConnectData.success:
 

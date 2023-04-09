@@ -17,7 +17,9 @@ class CommissionsAnalyzer(bt.Analyzer):
         )
 
         # Add the commission to the total commission
-        self.total_commission += commission
+        if(trade.status == 2):
+            self.total_commission += trade.commission
+            print("TOTAL commission till: %i" % self.total_commission)
 
     def stop(self):
         print(f"Total commission paid: {self.total_commission:.2f}")

@@ -49,7 +49,7 @@ class Backtesting:
         else:
             results = []
             budget = config["initialInvestment"]/len(symbols)
-            # #### TODO: replace config["initialInvestment"] with budget in backtest()
+            #### TODO: replace config["initialInvestment"] with budget in backtest()
             for symbol in symbols :
                 back_tested_data = backtest(
                         symbol,
